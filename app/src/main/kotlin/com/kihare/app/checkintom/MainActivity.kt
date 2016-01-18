@@ -1,5 +1,7 @@
 package com.kihare.app.checkintom
 
+import android.content.Intent
+import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.support.design.widget.FloatingActionButton
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -24,16 +27,20 @@ import android.widget.Toast
 import org.w3c.dom.Text
 import java.nio.charset.Charset
 
+import io.fabric.sdk.android.Fabric;
+import com.crashlytics.android.Crashlytics;
+
 class MainActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     private var mViewPager: ViewPager? = null
-
     private val MIME_TEXT_PLAIN = "text/plain"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Fabric.with(this, Crashlytics())
 
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
@@ -42,29 +49,52 @@ class MainActivity : AppCompatActivity() {
         mViewPager = findViewById(R.id.container) as ViewPager
         mViewPager!!.adapter = mSectionsPagerAdapter
 
-        val fab = findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener { view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show() }
-
-        var nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-        if(nfcAdapter == null || !nfcAdapter.isEnabled){
-            Toast.makeText(this, "failed", Toast.LENGTH_SHORT).show()
-        }
-
-        if(TextUtils.equals(intent.action, NfcAdapter.ACTION_NDEF_DISCOVERED)){
-            if (TextUtils.equals(intent.type, MIME_TEXT_PLAIN)) {
-
-            }
-        }
-
     }
 
     class PlaceholderFragment : Fragment() {
-
         override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val rootView = inflater!!.inflate(R.layout.fragment_main, container, false)
-            val textView = rootView.findViewById(R.id.section_label) as TextView
-            textView.text = getString(R.string.section_format, arguments.getInt(ARG_SECTION_NUMBER))
+            if(arguments.getInt(ARG_SECTION_NUMBER) != 0) return rootView
+
+            var nfcAdapter = NfcAdapter.getDefaultAdapter(activity)
+            if(nfcAdapter == null || !nfcAdapter.isEnabled){
+                Toast.makeText(activity, "failed", Toast.LENGTH_SHORT).show()
+            }
+
+            Log.d("NFC", "createFragment")
+            val activityIntent = activity.intent
+            if(TextUtils.equals(activityIntent.action, NfcAdapter.ACTION_TECH_DISCOVERED)){
+                val idm: String? = getIdm(activityIntent)
+                if (idm != null) {
+                    Log.d("NFC", "$idm")
+                    (rootView.findViewById(R.id.idm) as TextView).text = idm
+                }
+
+                val rawMsgs = activityIntent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                if (rawMsgs != null) {
+                    val msgs = arrayListOf<NdefMessage>()
+                    for (i in 0..rawMsgs.size- 1) {
+                        msgs[i] = rawMsgs[i] as NdefMessage
+                    }
+                    (rootView.findViewById(R.id.message) as TextView).text = msgs.toString()
+                } else {
+                    Log.d("NFC", "message is null.")
+                }
+            }
             return rootView
+        }
+
+        private fun getIdm(intent: Intent): String {
+            var idm: String = ""
+            val idmByte = StringBuffer()
+            val rawIdm = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)
+            if (rawIdm != null) {
+                for (i in 0..rawIdm.size - 1) {
+                    idmByte.append(Integer.toHexString(rawIdm[i].toInt()))
+                }
+                idm = idmByte.toString()
+            }
+            return idm
         }
 
         companion object {
