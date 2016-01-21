@@ -28,17 +28,17 @@
       android:launchMode="singleTop"
       android:theme="@style/AppTheme.NoActionBar"
       >
-      <!--<intent-filter>-->
-      <!--<action android:name="android.intent.action.MAIN"/>-->
-      <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-      <!--</intent-filter>-->
+      <intent-filter>
+      <action android:name="android.intent.action.MAIN"/>
+      <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
 
-      <!-- <intent-filter> -->
-      <!-- <action android:name="android.nfc.action.TECH_DISCOVERED" /> -->
-      <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-      <!-- </intent-filter> -->
-      <!-- <meta-data android:name="android.nfc.action.TECH_DISCOVERED" -->
-      <!-- android:resource="@xml/nfc_tech_list" /> -->
+       <intent-filter>
+       <action android:name="android.nfc.action.TECH_DISCOVERED" />
+       <category android:name="android.intent.category.DEFAULT" />
+       </intent-filter>
+       <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+       android:resource="@xml/nfc_tech_list" />
 
     </activity>
     <activity
@@ -46,11 +46,16 @@
       android:label="@string/title_activity_twitter_login"
       android:theme="@style/AppTheme.NoActionBar"
       >
+      <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.MAIN"/>-->
+        <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+      <!--</intent-filter>-->
       <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
+        <action android:name="android.nfc.action.TECH_DISCOVERED" />
+        <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
-      nh
+      <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+                 android:resource="@xml/nfc_tech_list" />
     </activity>
   </application>
 

@@ -6,11 +6,4 @@
   android:layout_height="match_parent"
   tools:context="com.kihare.app.checkintom.TwitterLoginActivity">
 
-  <com.twitter.sdk.android.core.identity.TwitterLoginButton
-    android:id="@+id/login_button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:enabled="true"/>
-
 </RelativeLayout>
